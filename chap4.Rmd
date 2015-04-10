@@ -1,0 +1,5 @@
+---
+title: "Modeling chap 3"
+output: html_document
+---
+

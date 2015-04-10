@@ -1,0 +1,69 @@
+---
+title: "chap2"
+output: html_document
+---
+
+#「データ解析のための統計モデリング入門」
+### Looking into the data
+```{r}
+setwd("/Users//shota/git/StatisticalModeling/chap2/")
+load("data.RData")
+data
+length(data)
+summary(data)
+table(data)
+par(mfrow=c(1,1))
+hist(data, breaks = seq(-0.5, 9.5, 1))
+var(data)
+sd(data)
+sqrt(var(data))
+```
+
+### Possion distruibution
+The Possion distribution is the distribtuion we want to use.
+Lambda is the only parameter in a Possion distribution.
+```{r}
+y <- 0:9
+prob <- dpois(y, lambda = 3.56)
+plot(y, prob, type = "b", lty = 2)
+cbind(y, prob)
+hist(data, breaks = seq(-0.5, 9.5 , 1))
+lines(y, 50 * prob, type = "b", lty = 2)
+```
+
+Possion distribution
+p(y | lambda) = (lambda ^ y) * exp(- lambda) / y!
+
+- The sum is 1: Sigma(y:1 -> Inf) p(y | lambda) = 1
+- The mean is lambda
+- mean = distribution
+
+Why Possion distribution?
+1. Count data
+2. Upper limit unknown
+3. Mean and distribution are similiar
+
+### Maximum likelihood estimation
+
+Multiplies the possion possiblity of all the subjects of a given lambda.
+Estimate the labmda that is best.
+L(lambda) = Pi(i: p(y_i | lambda))
+
+The log likelyhood function is thus
+log L(lambda) = Sigma i:(yi*log(lambda) - lambda - Sigma k:1 -> yi(log(k)))
+
+In code
+```{r}
+logL <- function(m) sum(dpois(data, m, log = TRUE))
+lambda <- seq(2, 5, 0.1)
+plot(lambda, sapply(lambda, logL), type = "l")
+```
+
+The maximum lambda can be found by division of log L(lambda) by lambda.
+
+The data was used by rpois()
+is this case,
+```{r}
+rpois(50, 3.5)
+```
+
