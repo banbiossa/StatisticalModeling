@@ -3,7 +3,10 @@ title: "chap3"
 output: html_document
 ---
 ```{r data}
-d <- read.csv("http://hosho.ees.hokudai.ac.jp/~kubo/stat/iwanamibook/fig/poisson/data3a.csv")
+setwd("/Users//shota/git/StatisticalModeling/")
+download.file("http://hosho.ees.hokudai.ac.jp/~kubo/stat/iwanamibook/fig/poisson/data3a.csv","data3.csv","curl")
+d <- read.csv("data3.csv")
+plot(d$x,d$y, pch = c(21,19)[d$f])
 ```
 
 ```{r exploratory}
