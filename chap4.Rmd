@@ -1,5 +1,31 @@
 ---
 title: "Modeling chap 3"
-output: html_document
+output: pdf_document
 ---
+# What's the best model?
+
+```{r full model}
+setwd("/Users//shota/git/StatisticalModeling/")
+download.file("http://hosho.ees.hokudai.ac.jp/~kubo/stat/iwanamibook/fig/poisson/data3a.csv","data3.csv","curl")
+d <- read.csv("data3.csv")
+sum(log(dpois(d$y, lambda = d$y)))
+```
+
+```{r null model}
+fit.null <- glm(formula = y ~ 1, family = poisson, data = d)
+fit.null
+logLik(fit.null)
+```
+
+## AIC (Akaike's information criterion)
+
+AIC = D + 2k  
+when k: number of parameters  
+D: log likelyhood
+
+### Bias  
+The estimated bias  of a log likelyhood model will always be   
+log(L) - k  
+Therefor it is natural that AIC should be calculated as 
+AIC = -2 * (log(L) - k)
 

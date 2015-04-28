@@ -1,0 +1,96 @@
+---
+title: "Statistical Modeling chap5"
+output: pdf_document
+---
+
+
+The differnce in the log likelyhood will be examined. 
+$$
+\Delta D_{1,2} = -2 \times(log L_1 - log L_2)
+$$
+
+The P value will be taken for the confidence interval.
+
+```{r data}
+setwd("/Users//shota/git/StatisticalModeling/")
+download.file("http://hosho.ees.hokudai.ac.jp/~kubo/stat/iwanamibook/fig/poisson/data3a.csv","data3.csv","curl")
+d <- read.csv("data3.csv")
+fit2 <- glm(y ~ x, data = d, family = poisson)
+fit1 <- glm(formula = y ~ 1, family = poisson, data = d)
+```
+
+```{r deviance}
+fit2$deviance
+fit1$deviance - fit2$deviance
+```
+
+The difference in the log likelyhood is about 4.5.
+
+The average number of seeds are estimated as 7.85.
+```{r average seeds}
+mean(d$y)
+fit1
+exp(2.058)
+```
+
+make 100 models from 7.85
+
+```{r 100 models}
+d$y.rnd <- rpois(100, lambda = mean(d$y))
+```
+
+Use the glm function to fit the constant model and x model to the new data.
+
+```{r glm new}
+fit1 <- glm(y.rnd ~ 1, data = d, family = poisson)
+fit2 <- glm(y.rnd ~ x, data = d, family = poisson)
+fit1$deviance - fit2$deviance
+```
+
+The model with x fits better (smaller deviance) than the actual model (just random poisson).  
+Do this 1000 times, and we get a distruibution. This is called the PB method.
+
+```{r pb}
+get.dd <- function(d){
+  n.sample <- nrow(d)
+  y.mean <- mean(d$y)
+  d$y.rnd <- rpois(n.sample, lambda = y.mean)
+  fit1 <- glm(y.rnd ~ 1, data = d, family = poisson)
+  fit2 <- glm(y.rnd ~ 2, data = d, family = poisson)
+  fit1$deviance - fit2$deviance
+}
+pb <- function(d, n.bootstrap){
+  replicate(n.bootstrap, get.dd(d))
+}
+?replicate
+getwd()
+```
+
+```{r pb method}
+source("pb.R")
+dd12 <- pb(d, n.bootstrap = 1000)
+
+summary(dd12)
+hist(dd12, 100)
+sum(dd12 >= 4.5)
+```
+
+36 are larger than 4.5.
+
+```{r quantile}
+quantile(dd12, 0.95)
+```
+
+The 95% confidence interval for this histogram is 3.92.
+
+## Using Chi-Square distruibutions
+
+The distribution of D_1,2 can be approximated by the chi-sq distribution.
+
+```{r chi-sq}
+fit1 <- glm(y ~ 1, data = d, family = poisson)
+fit2 <- glm(y ~ x, data = d, family = poisson)
+
+anova(fit1, fit2, test = "Chisq")
+```
+
