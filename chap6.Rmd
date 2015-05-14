@@ -1,0 +1,66 @@
+---
+title: "Statistical Modeling Chapter 6"
+output: pdf_document
+---
+
+```{r read}
+setwd("/Users//shotashimizu/git//StatisticalModeling")
+d <- read.csv("data4a.csv")
+summary(d)
+library(ggplot2)
+qplot(x, y, col = f, data = d)
+```
+
+# Logistic link functions
+
+a logistic function looks like
+$$
+q_i = logistic(z_i) = \frac{1}{1 + exp(-z_i)}
+$$
+```{r logistic link function}
+logistic <- function(z) 1/(1 + exp(-z))
+z <- seq(-6,6,0.1)
+plot(z, logistic(z), type = "l")
+```
+
+- a logit function is the inverse of the logistic function
+$$
+logit(q_i) = log \frac{q_i}{1 - q_i}
+$$
+
+## Log likely hood function
+- using the log-likelyhood function, this will be
+```{r loglikelyhood}
+fit.xf <- glm(cbind(y, N-y) ~ x + f, data = d, family = binomial)
+```
+
+- check by AIC
+```{r MASS}
+library(MASS)
+stepAIC(fit.xf)
+```
+
+## Intercect
+```{r intercect}
+glm(cbind(y, N-y) ~ x * f, family = binomial, data = d)
+```
+
+## Offsets
+```{r offset}
+d <- read.csv("data4b.csv")
+glm(y ~ x, offset = log(A), family = poisson, data = d)
+```
+
+## Gaussian
+```{r gaussian}
+y <- seq(-5, 5, 0.1)
+plot(y, dnorm(y, mean = 0, sd = 1), type = "l")
+pnorm(1.8, 0, 1) - pnorm(1.2, 0, 1)
+dnorm(1.5, 0, 1) * 0.6
+```
+
+## Gamma
+```{r gamma}
+load("d.RData")
+glm(y~log(x), family = Gamma(link = "log"), data = d)
+```
